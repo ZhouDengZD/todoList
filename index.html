@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>todoList</title>
+    <link href="index.css"rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Vue Todo</h1>
+            <h3>添加任务，管理每日计划</h3>
+        </div>
+        <div id="todoList" class="todoList">
+                <form v-on:submit.prevent="addNewTodo">
+                    <input
+                        class="addjob-input"
+                        v-model="newTodoText"
+                        id="new-todo"
+                        placeholder="今天计划完成什么？"
+                    >
+                    <button class="addjob-btn">添加任务</button>
+                </form>
+                <div class="jobList">
+                    <div class="jobList-header">
+                        <div>任务列表<ul><li v-bind:class='{on:state.all}' v-on:click="showAll">全部</li>
+                            <li  v-bind:class='{on:state.finishtodo}' v-on:click="showFinish">已完成</li>
+                            <li  v-bind:class='{on:state.unfinishtodo}' v-on:click="showUnfinish">未完成</li></ul></div>
+                    </div>
+                    <div class="jobList-content">
+                        <ul v-show="state.all">
+                            <li
+                                is="todo-item"
+                                v-for="(todo, index) in todos"
+                                v-bind:key="index"
+                                v-bind:content="todo.content"
+                                v-on:remove="removeTodo(todo,index)"
+                                v-on:addfinish="finish(todo)"
+                                v-on:addunfinish="unfinish(todo)"
+                                v-on:showUnfinish="showUnfinish"
+                                v-on:showFinish="showFinish"
+                            ></li>
+                        </ul>
+                        <ul v-show="state.finishtodo">
+                                <li
+                                    is="todo-list"
+                                    v-for="(todo, index) in finishs"
+                                    v-bind:key="index"
+                                    v-bind:content="todo.content"
+                                    v-on:remove="removeFinishTodo(todo,index)"
+                                ></li>
+                        </ul>   
+                        <ul v-show="state.unfinishtodo">
+                                <li
+                                    is="todo-list"
+                                    v-for="(todo, index) in unfinishs"
+                                    v-bind:key="index"
+                                    v-bind:content="todo.content"
+                                    v-on:remove="removeUnfinishTodo(todo,index)"
+                                ></li>
+                        </ul>
+                    </div>
+                    <div class="jobList-footer">
+                        <p v-bind:class='{show:state.all}'>共{{todos.length}}条任务</p>
+                        <p v-bind:class='{show:state.finishtodo}'>共{{finishs.length}}条任务</p>
+                        <p v-bind:class='{show:state.unfinishtodo}'>共{{unfinishs.length}}条任务</p>
+                    </div>
+                </div>
+                
+        </div>
+    </div>
+    
+    <script>
+        Vue.component('todo-item', {
+            template: '\
+                <li class="todo-item">\
+                    {{ content }}\
+                    <span v-on:click="$emit(\'remove\')" class="controll">✘</span>\
+                    <span v-on:click="$emit(\'addunfinish\')" class="controll">◑</span>\
+                    <span v-on:click="$emit(\'addfinish\')" class="controll">✔</span>\
+                </li>\
+                ',
+            props:['content']
+
+        })
+        Vue.component('todo-list', {
+            template: '\
+                <li class="todo-item">\
+                    {{ content }}\
+                    <span v-on:click="$emit(\'remove\')" class="controll">✘</span>\
+                </li>\
+                ',
+            props:['content']
+
+        })
+        new Vue({
+            el: '#todoList',
+            data: {
+                newTodoText:'',
+                todos: [],
+                nextTodoId : 2,
+                state:{
+                    all:true,
+                    finishtodo:false
+                },
+                unfinishs:[],
+                finishs:[],
+                visi:false
+            },
+            methods:{
+                addNewTodo: function () {
+                    //有值才添加
+                    if(this.newTodoText){
+                        this.todos.push({
+                        id: this.nextTodoId++,
+                        content: this.newTodoText
+                    })
+                        this.unfinishs.push({
+                            id: this.nextTodoId++,
+                            content: this.newTodoText
+                        })
+                        this.newTodoText = ''
+                    }
+                },
+                removeTodo: function(todo,index){
+                    this.todos.splice(index, 1);
+
+                     let index_f = this.finishs.indexOf(todo.content);
+                     let index_u = this.unfinishs.indexOf(todo.content);
+                     
+                     if(index_f){
+                        this.finishs.splice(index_f, 1);
+                     }
+                     if(index_u){
+                        this.unfinishs.splice(index_u, 1);
+                     }
+                },
+                removeFinishTodo:function(todo,index){
+                  
+                    this.finishs.splice(index, 1)
+
+                     let index_a = this.todos.indexOf(todo.content);
+                     let index_u = this.unfinishs.indexOf(todo.content);
+                     if(index_a){
+                        this.todos.splice(index_a, 1);
+                     }
+                     if(index_u){
+                        this.unfinishs.splice(index_u, 1);
+                     }
+                },
+                removeUnfinishTodo:function(todo,index){
+                    this.unfinishs.splice(index, 1);
+
+                    let index_a = this.todos.indexOf(todo.content);
+                    let index_f = this.finishs.indexOf(todo.content);
+                     
+                    if(index_a){
+                        this.todos.splice(index_a, 1);
+                    }
+                    if(index_f){
+                        this.finishs.splice(index_f, 1);
+                    }
+
+                },
+                unfinish:function(todo) {
+                    this.unfinishs.push(todo);
+                    console.log("点击添加至未完成");
+                    console.log(this.unfinishs);
+                },
+                finish:function(todo) {
+                    this.finishs.push(todo);
+                    let index = this.unfinishs.indexOf(todo.content);
+                    this.unfinishs.splice(index,1);
+
+                },
+                //展示三种类型各自的内容
+                showAll:function() {
+                    this.state.finishtodo = false;
+                    this.state.unfinishtodo =false;
+                    this.state.all = true;
+                },
+                showFinish:function(){
+                    this.state.finishtodo = true;
+                    this.state.unfinishtodo =false;
+                    this.state.all = false;
+                },
+                showUnfinish:function() {
+                    this.state.finishtodo = false;
+                    this.state.unfinishtodo =true;
+                    this.state.all = false;
+                    console.log('展示未完成事件',this.state.finishtodo,this.state.unfinishtodo,this.state.all)
+                }    
+            }
+        })
+    </script>
+</body>
+</html>

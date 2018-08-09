@@ -1,0 +1,131 @@
+ul,li,div,h1,input{
+    margin: 0;
+    padding: 0;
+}
+ul{
+    list-style-type: none;
+}
+.container{
+    width: 100%;
+    height: auto;
+}
+.header{
+    width: 100%;
+    height: 160px;
+    padding-top: 50px;
+    margin-bottom:20px; 
+    text-align: center;
+    background-color: rgb(233, 227, 227);
+}
+.todoList{
+    width: 100%;
+    text-align: center;
+}
+.addjob-input{
+    width: 40%;
+    height: 25px;
+    text-indent: 1em;
+    outline: none;
+    appearance: none;
+}
+.addjob-btn{
+    width: 80px;
+    height: 25px;
+    color: #fff;
+    background-color:#337ab7;
+    border-radius: 2px;
+    border: none;
+    /* outline: none; */
+}
+.jobList{
+    width: 60%;
+    height: auto;
+    margin: 20px auto 0;
+    text-align: left;
+    font-size: 14px;
+    border:2px solid #337ab7;
+    border-radius: 8px;
+}
+.jobList-header{
+    overflow: hidden;
+    width: 100%;
+    height: 30px;
+    box-sizing: border-box;
+    padding: 0 5px;
+    line-height: 30px;
+    color: #fff;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    background-color:#337ab7;
+}
+.jobList-header ul{
+    float: right;
+    margin-top: 3px;
+    width: 180px;
+    height: 24px;
+    background-color: #fff;
+    border-radius: 3px;
+}
+.jobList-header ul li{
+    position: relative;
+    float: left;
+    width: 60px;
+    height: 24px;
+    color: #000;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 3px;
+}
+.jobList-header ul li.on{
+    color: #fff;
+    background-color:  rgb(44, 191, 196)
+}
+.jobList-header ul li:not(:first-of-type)::before{
+    position: absolute;
+    right: 58px;
+    content: '|';
+    color: #ccc;
+}
+.todo-item{
+    /* overflow: hidden; */
+    width: 100%;
+    height: 35px;
+    line-height: 35px;
+    border-bottom: 1px solid #ddd;
+}
+.uncomplete,.completed{
+    display: inline-block;
+    margin-top: 5px; 
+    width: 50px;
+    height: 25px;
+    line-height: 25px;
+    text-align: center;
+    color: #fff;
+    border-radius: 3px;
+    
+}
+/* .uncomplete{
+    background-color: rgb(245, 186, 119);
+}
+.completed{
+    background-color: rgb(123, 245, 119);
+} */
+
+.controll{
+    float: right;
+    width: 20px;
+    text-align: center;
+}
+
+.jobList-footer{
+    height: 30px;
+    line-height: 30px;
+    border-radius: 7px;
+}
+.jobList-footer p{
+    display: none;
+}
+.jobList-footer p.show{
+    display:block;
+}
+
