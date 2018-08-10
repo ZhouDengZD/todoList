@@ -39,13 +39,12 @@
                                 v-for="(todo, index) in todos"
                                 v-bind:key="index"
                                 v-bind:content="todo.content"
-                                :uncompleted="todo.uncompleted"
+                                :uncompleted = "todo.uncompleted"
                                 v-on:remove="removeTodo(todo,index)"
                                 v-on:addfinish="finish(todo)"
                                 v-on:addunfinish="unfinish(todo)"
                                 v-on:showUnfinish="showUnfinish"
                                 v-on:showFinish="showFinish"
-                                
                             ></li>
                         </ul>
                         <ul v-show="state.finishtodo">
@@ -54,7 +53,7 @@
                                     v-for="(todo, index) in finishs"
                                     v-bind:key="index"
                                     v-bind:content="todo.content"
-                                    :uncompleted="todo.uncompleted"
+                                    :uncompleted = "todo.uncompleted"
                                     v-on:remove="removeFinishTodo(todo,index)"
                                 ></li>
                         </ul>   
@@ -64,7 +63,7 @@
                                     v-for="(todo, index) in unfinishs"
                                     v-bind:key="index"
                                     v-bind:content="todo.content"
-                                    :uncompleted="todo.uncompleted"
+                                    :uncompleted = "todo.uncompleted"
                                     v-on:remove="removeUnfinishTodo(todo,index)"
                                 ></li>
                         </ul>
@@ -83,27 +82,26 @@
         Vue.component('todo-item', {
             template: '\
                 <li class="todo-item">\
-                <span class="uncomplete" v-show="uncompleted">未完成</span>\
-                <span class="completed" v-show="!uncompleted">完成</span>\
+                    <span v-show="uncompleted" class="uncomplete">未完成</span>\
+                    <span v-show="!uncompleted" class="completed">已完成</span>\
                     {{ content }}\
                     <span v-on:click="$emit(\'remove\')" class="controll">✘</span>\
-                    <span v-on:click="$emit(\'addunfinish\')"  v-show="uncompleted" class="controll" >◑</span>\
-                    <span v-on:click="$emit(\'addfinish\')"  v-show="uncompleted" class="controll" >✔</span>\
+                    <span v-show="uncompleted"  v-on:click="$emit(\'addfinish\')" class="controll">✔</span>\
                 </li>\
                 ',
-            props:['content', 'uncompleted']
+            props:['content','uncompleted']
 
         })
         Vue.component('todo-list', {
             template: '\
                 <li class="todo-item">\
-                <span class="uncomplete" v-show="uncompleted">未完成</span>\
-                <span class="completed" v-show="!uncompleted">完成</span>\
+                <span v-show="uncompleted" class="uncomplete">未完成</span>\
+                <span v-show="!uncompleted" class="completed">已完成</span>\
                     {{ content }}\
                     <span v-on:click="$emit(\'remove\')" class="controll">✘</span>\
                 </li>\
                 ',
-            props:['content', 'uncompleted']
+            props:['content','uncompleted']
 
         })
         new Vue({
@@ -118,23 +116,23 @@
                 },
                 unfinishs:[],
                 finishs:[],
-                visi:false,
-                
+                visi:false
             },
             methods:{
                 addNewTodo: function () {
                     //有值才添加
-                    if(this.newTodoText && this.newTodoText.trim()){
-                        this.todos.push({
-                        id: this.nextTodoId++,
-                        content: this.newTodoText,
-                        uncompleted:true
-                    })
+                    if(this.newTodoText){
                         this.unfinishs.push({
+                            id: this.nextTodoId,
+                            content: this.newTodoText,
+                            uncompleted:true
+                        })
+                        this.todos.push({
                             id: this.nextTodoId++,
                             content: this.newTodoText,
                             uncompleted:true
                         })
+                        
                         this.newTodoText = ''
                     }
                 },
@@ -150,47 +148,28 @@
                      if(index_u){
                         this.unfinishs.splice(index_u, 1);
                      }
+
+                     console.log(todo.content,index_f,index_u)
                 },
                 removeFinishTodo:function(todo,index){
                   
                     this.finishs.splice(index, 1)
 
-                     let index_a = this.todos.indexOf(todo.content);
-                     let index_u = this.unfinishs.indexOf(todo.content);
-                     if(index_a){
-                        this.todos.splice(index_a, 1);
-                     }
-                     if(index_u){
-                        this.unfinishs.splice(index_u, 1);
-                     }
+                    let index_a = this.todos.indexOf(todo.content);
+                    this.todos.splice(index_a, 1);
                 },
                 removeUnfinishTodo:function(todo,index){
                     this.unfinishs.splice(index, 1);
 
                     let index_a = this.todos.indexOf(todo.content);
-                    let index_f = this.finishs.indexOf(todo.content);
-                     
-                    if(index_a){
-                        this.todos.splice(index_a, 1);
-                    }
-                    if(index_f){
-                        this.finishs.splice(index_f, 1);
-                    }
-
-                },
-                unfinish:function(todo) {
-                    todo.uncompleted = false; //隐藏 添加至完成 添加至未完成按钮
-                    console.log(todo.uncompleted);
-                    this.unfinishs.push(todo);
-                    console.log("点击添加至未完成");
-                    console.log(this.unfinishs);
+                    this.todos.splice(index_a, 1);
                 },
                 finish:function(todo) {
-                    todo.uncompleted = false; //隐藏 添加至完成 添加至未完成按钮
                     this.finishs.push(todo);
+                    todo.uncompleted = false;
+
                     let index = this.unfinishs.indexOf(todo.content);
                     this.unfinishs.splice(index,1);
-
                 },
                 //展示三种类型各自的内容
                 showAll:function() {

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>vue todo list</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <style>
+     #app {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .title {
+      text-align: center;
+    }
+    .header {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    .header > input {
+      margin-right: 12px;
+      width: 400px;
+    }
+    .content {
+      margin: 0 auto;
+      width: 60%;
+    }
+    .content .panel-heading, .list-group-item {
+      display: flex;
+      justify-content: space-between;
+    }
+    .list-group-item .glyphicon {
+      cursor: pointer;
+      font-size: 24px;
+    }
+    .ok {
+      color: #497443;
+    }
+    .cancel {
+      color: #9e4a46;
+    }
+    .remove {
+      color: #fbf8e5;
+    }
+    .edit-btn-group {
+      width: 150px;
+      text-align: right;
+    }
+    .activeBtn {
+      color: #fff;
+      background-color: #000;
+      border-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="jumbotron title">
+        <h1>Vue Todo</h1>
+        <p>添加任务，管理每日计划</p>
+    </div>
+    <div class="header">
+        <input
+          type="text"
+          class="form-control" 
+          id="exampleInputName2"
+          placeholder="今天计划完成什么？"
+          v-model="newTodo"
+          @keyup.enter="addTodo"
+        >
+        <button type="button" class="btn btn-primary" @click="addTodo">添加任务</button>
+    </div>
+    <div class="panel panel-primary content" v-show="todos.length"> 
+      <div class="panel-heading">
+        <span>任务列表</span>
+        <div class="btn-group button-list" role="group" aria-label="...">
+            <button type="button" :class="['btn', 'btn-default', { 'btn-info': activeBtn === 'all' } ]" @click="handleAll">全部</button>
+            <button type="button" :class="['btn', 'btn-default', { 'btn-info': activeBtn === 'completed' } ]" @click="handleComplete">已完成</button>
+            <button type="button" :class="['btn', 'btn-default', { 'btn-info': activeBtn === 'cancel' } ]" @click="handleCancel">未完成</button>
+        </div>
+      </div>
+      <ul class="list-group">
+        <li class="list-group-item" v-for="todo in filteredTodos" :key="todo.id">
+            <span>
+                <span v-if="todo.completed" class="label label-primary">完成</span>
+                <span v-else class="label label-warning">未完成</span>
+              {{ todo.value }}
+            </span>
+            <div class="edit-btn-group">
+                <span v-if="!todo.completed" class="glyphicon glyphicon-ok-circle ok" aria-hidden="true" @click="completeTodo(todo)"></span>
+                <span v-if="!todo.completed && activeBtn !== 'cancel'" class="glyphicon glyphicon-ban-circle cancel" aria-hidden="true" @click="cancelTodo(todo)"></span>
+                <span class="glyphicon glyphicon-remove-circle cancel" aria-hidden="true" @click="removeTodo(todo)"></span>
+            </div>
+        </li>
+      </ul>
+      <div class="panel-footer">共{{todos.length}}项任务</div>
+    </div>
+  </div>
+  <script>
+    var filters = {
+      all: function (todos) {
+        return todos
+      },
+      cancel: function (todos) {
+        var data = todos.filter(function (todo) {
+          return !todo.completed
+        })
+        app.cancelLength = data.length;
+        return date
+      },
+      completed: function (todos) {
+        return todos.filter(function (todo) {
+          return todo.completed
+        })
+      }
+    }
+    var app = new Vue({
+      el: '#app',
+      data: {
+        todos: [
+          {
+            id: 'pp',
+            value: '123',
+            completed: true,
+          },
+          {
+            id: 'p',
+            value: '12',
+            completed: false,
+          }
+        ],
+        newTodo: '',
+        todoType: 'all',
+        activeBtn: 'all',
+        cancelLength: 0,
+      },
+      computed: {
+        filteredTodos: function () {
+          var data = filters[this.todoType](this.todos);
+          return data;
+        },
+      },
+      methods: {
+        addTodo: function () {
+          var value = this.newTodo && this.newTodo.trim()
+          if (!value) {
+            return
+          }
+          this.todos.push({
+            id: new Date().toString(),
+            value: value,
+            completed: false
+          })
+          this.newTodo = ''
+        },
+        handleAll: function () {
+          this.activeBtn = 'all';
+          this.todoType = 'all';
+          return this.todos;
+        },
+        handleComplete: function () {
+          this.activeBtn = 'completed';
+          this.todoType = 'completed';
+        },
+        handleCancel: function () {
+          this.activeBtn= 'cancel';
+          this.todoType = 'cancel';
+        },
+        completeTodo: function(todo) {
+          todo.completed = true;
+        },
+        cancelTodo: function(todo) {
+          todo.completed = false;
+        },
+        removeTodo: function (todo) {
+          this.todos.splice(this.todos.indexOf(todo), 1)
+        },
+      },
+    });
+  </script>
+</body>
+</html>
