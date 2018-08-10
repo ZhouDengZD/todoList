@@ -8,6 +8,8 @@
     <title>todoList</title>
     <link href="index.css"rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style type="">
+    </style>
 </head>
 
 <body>
@@ -40,30 +42,30 @@
                                 v-bind:key="index"
                                 v-bind:content="todo.content"
                                 :uncompleted = "todo.uncompleted"
+                                :notundo = "notundo"
                                 v-on:remove="removeTodo(todo,index)"
                                 v-on:addfinish="finish(todo)"
-                                v-on:addunfinish="unfinish(todo)"
-                                v-on:showUnfinish="showUnfinish"
-                                v-on:showFinish="showFinish"
                             ></li>
                         </ul>
                         <ul v-show="state.finishtodo">
                                 <li
-                                    is="todo-list"
+                                    is="todo-item"
                                     v-for="(todo, index) in finishs"
                                     v-bind:key="index"
                                     v-bind:content="todo.content"
                                     :uncompleted = "todo.uncompleted"
+                                    :notundo = "notundo"
                                     v-on:remove="removeFinishTodo(todo,index)"
                                 ></li>
                         </ul>   
                         <ul v-show="state.unfinishtodo">
                                 <li
-                                    is="todo-list"
+                                    is="todo-item"
                                     v-for="(todo, index) in unfinishs"
                                     v-bind:key="index"
                                     v-bind:content="todo.content"
                                     :uncompleted = "todo.uncompleted"
+                                    :notundo = "notundo"
                                     v-on:remove="removeUnfinishTodo(todo,index)"
                                 ></li>
                         </ul>
@@ -86,37 +88,25 @@
                     <span v-show="!uncompleted" class="completed">已完成</span>\
                     {{ content }}\
                     <span v-on:click="$emit(\'remove\')" class="controll">✘</span>\
-                    <span v-show="uncompleted"  v-on:click="$emit(\'addfinish\')" class="controll">✔</span>\
+                    <span v-show="uncompleted && notundo"  v-on:click="$emit(\'addfinish\')" class="controll">✔</span>\
                 </li>\
                 ',
-            props:['content','uncompleted']
-
-        })
-        Vue.component('todo-list', {
-            template: '\
-                <li class="todo-item">\
-                <span v-show="uncompleted" class="uncomplete">未完成</span>\
-                <span v-show="!uncompleted" class="completed">已完成</span>\
-                    {{ content }}\
-                    <span v-on:click="$emit(\'remove\')" class="controll">✘</span>\
-                </li>\
-                ',
-            props:['content','uncompleted']
-
+            props:['content','uncompleted','notundo']
         })
         new Vue({
             el: '#todoList',
             data: {
                 newTodoText:'',
                 todos: [],
-                nextTodoId : 2,
+                nextTodoId : 0,
                 state:{
                     all:true,
                     finishtodo:false,
                 },
                 unfinishs:[],
                 finishs:[],
-                visi:false
+                visi:false,
+                notundo:true
             },
             methods:{
                 addNewTodo: function () {
@@ -135,47 +125,79 @@
                         
                         this.newTodoText = ''
                     }
+                    console.log(this.todos,this.unfinishs)
                 },
                 removeTodo: function(todo,index){
                     this.todos.splice(index, 1);
+                    this.unfinishs.some(function(item,index,arr){
+                        if(item.id === todo.id){
+                            arr.splice(index,1);
+                            return true;
+                        }
+                    })
+                    this.finishs.some(function(item,index,arr){
+                        if(item.id === todo.id){
+                            arr.splice(index,1);
+                            return true;
+                        }
+                    })
 
-                     let index_f = this.finishs.indexOf(todo.content);
-                     let index_u = this.unfinishs.indexOf(todo.content);
+                    //  let index_f = this.finishs.indexOf(todo); //起作用
+                    //  let index_u = this.unfinishs.indexOf(todo);//不起作用 -1
                      
-                     if(index_f){
-                        this.finishs.splice(index_f, 1);
-                     }
-                     if(index_u){
-                        this.unfinishs.splice(index_u, 1);
-                     }
+                    //  if(index_f >= 0){
+                    //     this.finishs.splice(index_f, 1);
+                    //     console.log('qqqqq')
+                    //  }
+                    //  if(index_u >= 0){
+                    //     this.unfinishs.splice(index_u, 1);
+                    //     console.log('ppppp')
+                    //  }
 
-                     console.log(todo.content,index_f,index_u)
                 },
                 removeFinishTodo:function(todo,index){
                   
                     this.finishs.splice(index, 1)
+                    this.todos.some(function(item,index,arr){
+                        if(item.id === todo.id){
+                            arr.splice(index,1);
+                            return true;
+                        }
+                    })
+                    // this.todos.splice(this.todos.indexOf(todo), 1);//起作用
 
-                    let index_a = this.todos.indexOf(todo.content);
-                    this.todos.splice(index_a, 1);
                 },
                 removeUnfinishTodo:function(todo,index){
                     this.unfinishs.splice(index, 1);
-
-                    let index_a = this.todos.indexOf(todo.content);
-                    this.todos.splice(index_a, 1);
+                    this.todos.some(function(item,index,arr){
+                        if(item.id === todo.id){
+                            arr.splice(index,1);
+                            return true;
+                        }
+                    })
+                    // this.todos.splice(this.todos.indexOf(todo), 1);//不起作用
                 },
+
+
                 finish:function(todo) {
                     this.finishs.push(todo);
                     todo.uncompleted = false;
-
-                    let index = this.unfinishs.indexOf(todo.content);
-                    this.unfinishs.splice(index,1);
+                   
+                    this.unfinishs.some(function(item,index,arr){
+                        if(item.id === todo.id){
+                            arr.splice(index,1);
+                            return true;
+                        }
+                    })
+                    // this.unfinishs.splice(this.unfinishs.indexOf(todo),1); //未起作用
                 },
                 //展示三种类型各自的内容
                 showAll:function() {
                     this.state.finishtodo = false;
                     this.state.unfinishtodo =false;
                     this.state.all = true;
+
+                    this.state.notundo = false;
                 },
                 showFinish:function(){
                     this.state.finishtodo = true;
@@ -186,10 +208,47 @@
                     this.state.finishtodo = false;
                     this.state.unfinishtodo =true;
                     this.state.all = false;
-                    console.log('展示未完成事件',this.state.finishtodo,this.state.unfinishtodo,this.state.all)
+                    this.notundo = false;
                 }    
             }
         })
     </script>
 </body>
 </html>
+
+<!-- 在项目中（三个数组：todos、finishs、unfinishs），出现了以下问题：
+removeTodo: function(todo,index){
+  let index_f = this.finishs.indexOf(todo);    //起作用
+  let index_u = this.unfinishs.indexOf(todo);  //不起作用 -1
+}
+最后推断可能是因为：
+if(this.newTodoText){
+                        this.unfinishs.push({
+                            id: this.nextTodoId,
+                            content: this.newTodoText,
+                            uncompleted:true
+                        })
+                        this.todos.push({
+                            id: this.nextTodoId++,
+                            content: this.newTodoText,
+                            uncompleted:true
+                        })
+                        this.newTodoText = ''
+ }
+unfinishs和todos，是在最开始的时候分别创建的，两个数组的内存地址指向不同。而finish中的数据其实是从todos中push进来的，地址指向相同。因为当前的todo是从todos中取出的，内容及内存地址可以和finishs中的完全匹配上，所以indeOf()才可以找到。而unfinishs中的数据因为内存地址不同，所以返回-1。
+最后改为使用some()函数即可：
+removeTodo: function(todo,index){
+                    this.todos.splice(index, 1);
+                    this.unfinishs.some(function(item,index,arr){
+                        if(item.id === todo.id){
+                            arr.splice(index,1);
+                            return true;
+                        }
+                    })
+                    this.finishs.some(function(item,index,arr){
+                        if(item.id === todo.id){
+                            arr.splice(index,1);
+                            return true;
+                        }
+                    })
+} -->

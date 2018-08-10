@@ -109,8 +109,8 @@
         var data = todos.filter(function (todo) {
           return !todo.completed
         })
-        app.cancelLength = data.length;
-        return date
+        // app.cancelLength = data.length;
+        return data;
       },
       completed: function (todos) {
         return todos.filter(function (todo) {
